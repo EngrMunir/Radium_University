@@ -129,6 +129,17 @@ const studentSchema = new Schema<TStudent, StudentModel>({
   },
 });
 
+// pre save middleware/hook : will work on create() save()
+// can not use arrow function bcs we need to use this keywords
+studentSchema.pre('save', function(){
+  console.log(this, 'pre hook : we will save the data');
+})
+
+// post save middleware/hook
+studentSchema.post('save', function(){
+  console.log(this,'post hook : we save our data')
+})
+
 // creating a custom static method
 studentSchema.statics.isUserExists = async function(id:string) {
   const existingUser = await Student.findOne({id})
