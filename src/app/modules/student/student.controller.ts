@@ -4,6 +4,7 @@ import { StudentServices } from './student.service';
 // import studentValidationSchema from './student.joi.validation';
 import { z } from 'zod';
 import studentValidationSchema from './student.validation';
+import { error } from 'console';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
@@ -37,10 +38,11 @@ const createStudent = async (req: Request, res: Response) => {
       message: 'Student is created successfully',
       data: result,
     });
-  } catch (err) {
+  } catch (err:any){
     res.status(500).json({
       success:false,
-      message:'something went wrong'
+      message: err.message || 'something went wrong',
+      error:err,
     })
   }
 };
