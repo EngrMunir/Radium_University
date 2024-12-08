@@ -9,6 +9,9 @@ import {
   StudentModel,
 } from './student.interface';
 
+import bcrypt from 'bcrypt'
+import config from '../../config';
+
 const userNameSchema = new Schema<TUserName>({
   firstName: { 
     // built-in validation
@@ -83,6 +86,12 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required:true, 
     unique:true 
   },
+  password: { 
+    type: String, 
+    required:[true,'Password is required'], 
+    unique:true ,
+    maxlength:[20,'Password can not be more than 20 character']
+  },
   name: {
     type:userNameSchema,
     required: true,
@@ -129,16 +138,28 @@ const studentSchema = new Schema<TStudent, StudentModel>({
   },
 });
 
+
 // pre save middleware/hook : will work on create() save()
 // can not use arrow function bcs we need to use this keywords
-studentSchema.pre('save', function(){
-  console.log(this, 'pre hook : we will save the data');
+studentSchema.pre('save', async function(){
+  // console.log(this, 'pre hook : we will save the data');
+
+  const user = this;
+  // hashing password and save into db
+  user.password =await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds) )
+
 })
 
 // post save middleware/hook
 studentSchema.post('save', function(){
-  console.log(this,'post hook : we save our data')
+  console.log(this,'post hook : we saved our data')
 })
+
+
+
+
+
+
 
 // creating a custom static method
 studentSchema.statics.isUserExists = async function(id:string) {

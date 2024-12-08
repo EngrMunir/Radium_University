@@ -38,6 +38,7 @@ const userNameValidationSchema = z.object({
   // Student Schema
   const studentValidationSchema = z.object({
     id: z.string().min(1, 'ID is required'),
+    password:z.string().max(20),
     name: userNameValidationSchema,
     gender: z.enum(['female', 'male', 'other']),
     dateOfBirth: z.string().optional(),
