@@ -136,24 +136,59 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     enum:['active', 'blocked'],
     default: 'active',
   },
+  isDeleted:{
+    type:Boolean,
+    default:false,
+  }
+},{
+  toJSON:{
+    virtuals:true,
+  }
 });
 
+// virtual used for data which do not need to save at db but show to client
+
+studentSchema.virtual('fullName').get( function(){
+  return (
+    `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`
+  )
+})
 
 // pre save middleware/hook : will work on create() save()
 // can not use arrow function bcs we need to use this keywords
-studentSchema.pre('save', async function(){
+studentSchema.pre('save', async function(next){
   // console.log(this, 'pre hook : we will save the data');
 
   const user = this;
   // hashing password and save into db
   user.password =await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds) )
-
+  next()
 })
 
 // post save middleware/hook
-studentSchema.post('save', function(){
-  console.log(this,'post hook : we saved our data')
+studentSchema.post('save', function(doc, next){
+  doc.password=''
+  next()
+});
+
+// query middleware
+studentSchema.pre('find', function(next){
+  this.find({isDeleted: {$ne: true}});
+  next();
 })
+
+studentSchema.pre('findOne', function(next){
+  this.find({isDeleted: {$ne: true}});
+  next();
+})
+
+// [ {$match:{ isDeleted: {$ne:true}} },{'$match':{id:'123456'}}]
+// aggregate middleware
+studentSchema.pre('aggregate', function (next){
+  this.pipeline().unshift({$match: { isDeleted: {$ne: true}}})
+  next()
+})
+
 
 
 
