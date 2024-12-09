@@ -3,14 +3,11 @@ import validator from 'validator';
 import {
   TGuardian,
   TLocalGuardian,
-  // StudentMethods,
   TStudent,
   TUserName,
   StudentModel,
 } from './student.interface';
 
-import bcrypt from 'bcrypt'
-import config from '../../config';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: { 
@@ -83,14 +80,14 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 const studentSchema = new Schema<TStudent, StudentModel>({
   id: { 
     type: String, 
-    required:true, 
+    required:[true, 'ID is required'], 
     unique:true 
   },
-  password: { 
-    type: String, 
-    required:[true,'Password is required'], 
-    unique:true ,
-    maxlength:[20,'Password can not be more than 20 character']
+  user:{
+    type: Schema.Types.ObjectId,
+    required: [true, 'ID is required'],
+    unique:true,
+    ref:'User', //kon model er sate connect hba
   },
   name: {
     type:userNameSchema,
@@ -131,11 +128,6 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required:true
   },
   profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum:['active', 'blocked'],
-    default: 'active',
-  },
   isDeleted:{
     type:Boolean,
     default:false,
@@ -154,22 +146,6 @@ studentSchema.virtual('fullName').get( function(){
   )
 })
 
-// pre save middleware/hook : will work on create() save()
-// can not use arrow function bcs we need to use this keywords
-studentSchema.pre('save', async function(next){
-  // console.log(this, 'pre hook : we will save the data');
-
-  const user = this;
-  // hashing password and save into db
-  user.password =await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds) )
-  next()
-})
-
-// post save middleware/hook
-studentSchema.post('save', function(doc, next){
-  doc.password=''
-  next()
-});
 
 // query middleware
 studentSchema.pre('find', function(next){
