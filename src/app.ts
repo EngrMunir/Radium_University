@@ -1,9 +1,14 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any*/
 import cors from 'cors';
-import express, { Application, Request, Response } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import { StudentRoutes } from './app/modules/student/student.route';
 import { UserRoutes } from './app/modules/user/user.route';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
 const app: Application = express();
-const port = 3000;
 
 // parsers
 app.use(express.json());
@@ -21,5 +26,10 @@ const getAController = (req: Request, res: Response) => {
 };
 
 app.get('/', getAController);
+
+app.use(globalErrorHandler)
+
+// NOT FOUND
+app.use(notFound)
 
 export default app;
