@@ -43,7 +43,7 @@ const userNameValidationSchema = z.object({
       student:z.object({
       name: userNameValidationSchema,
       gender: z.enum(['female', 'male', 'other']),
-      dateOfBirth: z.date().optional(),
+      dateOfBirth: z.string().optional(),
       email: z
         .string()
         .min(1, 'Email is required')
