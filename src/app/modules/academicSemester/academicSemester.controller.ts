@@ -22,7 +22,7 @@ const getAllAcademicSemesters = catchAsync( async (req, res) =>{
   sendResponse(res,{
     statusCode: httpStatus.OK,
     success:true,
-    message:'All Academic semester is retrived successfully',
+    message:'All Academic semester are retrieved successfully',
     data:result
   })
 })
