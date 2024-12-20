@@ -30,7 +30,7 @@ const getAllStudentsFromDB = async (query:Record<string, unknown>) => {
   })
 
 // filtering
-const excludeFields =['searchTerm','sort','limit','page']
+const excludeFields =['searchTerm','sort','limit','page','fields']
 
 excludeFields.forEach(el => delete queryObj[el]);
 
@@ -65,11 +65,22 @@ console.log({query}, {queryObj});
   }
 
   const paginateQuery = sortQuery.skip(skip);
+
+  const limitQuery = paginateQuery.limit(limit);
   
+  // field limiting
+  let fields ='-__V';
+  // fields:'name,email';
+  // fields:'name email';
 
-  const limitQuery = await paginateQuery.limit(limit);
+  if(query.fields){
+    fields = (query.fields as string).split(',').join(' ');
+    console.log({fields});
+  }
 
-  return limitQuery;
+  const fieldQuery = await limitQuery.select(fields);
+
+  return fieldQuery;
 };
 
 // update primitive and non primitive data simultaneously
