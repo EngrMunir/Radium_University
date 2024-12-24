@@ -24,7 +24,7 @@ const createOfferedCourseValidationSchema = z.object({
         },{
             message:"Invalid time format, expected 'HH:MM' in 24 hours format"
         }),
-    }).refine(({body}) => {
+    }).refine((body) => {
         //startTime:10:30 => 1970-01-01T10:30
         // endTime:12:30 =>1970-01-01T12:30
 
@@ -32,6 +32,8 @@ const createOfferedCourseValidationSchema = z.object({
         const end = new Date(`1970-01-01T${body.endTime}:00`) //date will be same any date can be assign and here compare will be for time only
 
         return end>start;
+    },{
+        message:'Start time should be before end time!'
     }),
 });
 
